@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUI Linear Circuit Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- Toolbar -->
+        <div id="toolbar">
+            <div class="toolbar-header">
+                <h1>Circuit-Simulator</h1>
+                <p>A GUI-based linear circuit simulator.</p>
+            </div>
+            
+            <div class="section">
+                <h2>Tools</h2>
+                <div class="tool-grid">
+                    <button id="tool-select" class="tool-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    </button>
+                    <button id="tool-resistor" class="tool-btn">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h2l2-3 2 5 2-4 2 5 2-3h2"/></svg>
+                    </button>
+                    <button id="tool-voltage" class="tool-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M8 8h8M8 16h8"/></svg>
+                    </button>
+                    </button>
+                    <button id="tool-wire" class="tool-btn">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+                    </button>
+                    <button id="tool-ground" class="tool-btn">
+                       <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12 2V12 M4 12H20 M7 16H17 M10 20H14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>
+                    </button>
+                    <button id="tool-inductor" class="tool-btn">
+                        <svg width="64" height="24" viewBox="0 0 64 24" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"><path d="M2 12 H 14 C 14 4, 22 4, 22 12 S 30 20, 30 12 S 38 4, 38 12 S 46 20, 46 12 H 62" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button id="tool-capacitor" class="tool-btn">
+                       <svg width="64" height="24" viewBox="0 0 64 24" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"><path d="M2 12 H 26 M 38 12 H 62 M 26 4 V 20 M 38 4 V 20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                    </button>
+                     <button id="tool-delete" class="tool-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="simulation-controls">
+                <button id="run-simulation" class="sim-button">Run Simulation</button>
+                <button id="clear-canvas" class="sim-button">Clear All</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content">
+            <div id="canvas-and-props">
+                 <!-- Canvas -->
+                <div id="canvas-container">
+                    <canvas id="circuit-canvas"></canvas>
+                </div>
+
+                <!-- Properties Panel -->
+                <div id="properties-wrapper">
+                    <h2>Properties</h2>
+                    <div id="properties-panel">
+                        <p>Select a component to see its properties.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results Modal -->
+    <div id="results-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Simulation Results</h2>
+                <button id="close-modal-btn">&times;</button>
+            </div>
+            <div id="results-content">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
+
+
