@@ -410,7 +410,6 @@
             }
         }
         
-        // --- Simulation Logic (Client Side) ---
         async function runSimulation() {
             const runButton = document.getElementById('run-simulation');
             runButton.disabled = true;
@@ -422,31 +421,40 @@
                 groundNodeId
             };
 
+            // keep local backend address (change to your deployed URL when needed)
             const backendUrl = 'http://127.0.0.1:5000/simulate';
 
             try {
                 const response = await fetch(backendUrl, {
-                    method: 'POST',
+                    method : 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(circuitData),
                 });
 
-                const result = await response.json();
+                // If response is not JSON (server error), try to surface it
+                let result;
+                try {
+                    result = await response.json();
+                } catch (err) {
+                    throw new Error(`Server returned non-JSON response (status ${response.status}).`);
+                }
 
                 if (!response.ok) {
-                    throw new Error(result.error || 'An unknown error occurred.');
-                }
-                
-                if(result.status === 'success') {
-                    showResults(result.voltages);
-                } else {
-                    showSimulationError(result.error);
-                }
+                // server returned an error object - show its message if available
+                throw new Error(result.error || `Server returned status ${response.status}`);
+            }
+
+            if (result.status === 'success') {
+            // pass the entire result object (contains nodes and branches)
+                showResults(result);
+            } else {
+                showSimulationError(result.error || 'Simulation failed (unknown).');
+            }
 
             } catch (error) {
                 console.error('Simulation request failed:', error);
                 let errorMessage = 'Could not connect to the Python backend. Is it running?';
-                if (error.message && !error.message.includes('Failed to fetch')) {
+                if (error && error.message && !error.message.includes('Failed to fetch')) {
                     errorMessage = error.message;
                 }
                 showSimulationError(errorMessage);
@@ -455,7 +463,6 @@
                 runButton.textContent = 'Run Simulation';
             }
         }
-        
         // --- UI Feedback ---
         function showResultsModal() {
             document.getElementById('results-modal').classList.remove('hidden');
@@ -464,22 +471,64 @@
         function hideResultsModal() {
             document.getElementById('results-modal').classList.add('hidden');
         }
+        function showResults(result) {
+            // defensive checks
+            if (!result || typeof result !== 'object') {
+                showSimulationError('Invalid response from backend.');
+                return;
+            }
 
-        function showResults(voltages) {
-            let html = '<table><thead><tr><th>Node</th><th>Voltage</th></tr></thead><tbody>';
-            
-            const sortedNodes = Object.keys(voltages).map(Number).sort((a,b) => a-b);
+            const nodes = result.nodes || {};
+            const branches = Array.isArray(result.branches) ? result.branches : [];
 
-            for(const nodeIndex of sortedNodes) {
-                 const voltage = voltages[nodeIndex];
-                 const isGround = voltage === 0.0;
-                 html += `<tr>
-                    <td>Node ${nodeIndex} ${isGround ? '(GND)' : ''}</td>
-                    <td class="font-mono">${voltage.toFixed(4)} V</td>
-                 </tr>`;
-            };
+            // Build Node Voltages table
+            let html = '<h3>Node Voltages</h3>';
+            html += '<table class="results-table"><thead><tr><th>Node</th><th>Voltage (V)</th></tr></thead><tbody>';
 
+            const nodeKeys = Object.keys(nodes);
+            if (nodeKeys.length === 0) {
+                html += '<tr><td colspan="2">No node data returned</td></tr>';
+            } else {
+                const sortedNodes = nodeKeys.map(Number).sort((a, b) => a - b);
+                for (const nodeIndex of sortedNodes) {
+                    const v = nodes[String(nodeIndex)];
+                    const displayV = (typeof v === 'number') ? v.toFixed(6) : String(v);
+                    const isGround = Number(nodeIndex) === 0;
+                    html += `<tr>
+                        <td>Node ${nodeIndex} ${isGround ? '(GND)' : ''}</td>
+                        <td class="font-mono">${displayV}</td>
+                    </tr>`;
+                }
+            }
             html += '</tbody></table>';
+
+            // Build Branch (component) table
+            html += '<h3 style="margin-top:1rem;">Component Voltages & Currents</h3>';
+            html += '<table class="results-table"><thead><tr><th>Component</th><th>Type</th><th>Voltage (V)</th><th>Current (A)</th></tr></thead><tbody>';
+
+            if (branches.length === 0) {
+                html += '<tr><td colspan="4">No branch data returned</td></tr>';
+            } else {
+                for (const b of branches) {
+                    const cid = b.componentId ?? b.componentID ?? b.id ?? 'unknown';
+                    const type = b.type ?? '';
+                    const v = (b.voltage !== undefined && b.voltage !== null) ? Number(b.voltage) : NaN;
+                    const i = (b.current !== undefined && b.current !== null) ? Number(b.current) : NaN;
+
+                    const vStr = Number.isFinite(v) ? v.toFixed(6) : '—';
+                    // show currents in decimal or exponential for small/large numbers
+                    const iStr = Number.isFinite(i) ? (Math.abs(i) < 1e-3 && i !== 0 ? i.toExponential(4) : i.toFixed(6)) : '—';
+
+                    html += `<tr>
+                        <td>${cid}</td>
+                        <td>${type}</td>
+                        <td class="font-mono">${vStr}</td>
+                        <td class="font-mono">${iStr}</td>
+                    </tr>`;
+                }
+            }
+            html += '</tbody></table>';
+
             document.getElementById('results-content').innerHTML = html;
             showResultsModal();
         }
