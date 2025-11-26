@@ -1,4 +1,9 @@
+CIRCUIT SIMULATOR.
+This project is a simple GUI based circuit simulator, where one can make circuits with resistors, capacitors, inductors and voltage sources as the components. The simulator will return the values of node voltages and currents for dc analysis, as well as the plots of currents through resistors,inductors,capacitors and voltage sources through transient analysis for a given amount of time as specified by the user. The frontend(GUI) was made using HTML,CSS, and Javascript while the backend was made using MATLAB and python. Python was used for generating netlist of the simulated circuit and for integrating the frontend and backend with ease. Modified Nodal Analysis is used for calculation of voltages and currents in the MATLAB backend.
+
+
 HOW TO RUN?
+
 1)Clone the github repo into your pc.
 
 2)Open the project in VS code. In VS code terminal, run the following commands- "pip install flask numpy" and "pip install flask-cors".
